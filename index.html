@@ -126,10 +126,38 @@ text{
         <br>
         <button onclick="convertTextToSpeechAndPlay()" id="playButton">Convert
             Text to Speech and Play</button><br>
-        <button onclick="downloadAudio()">Download Audio</button><br>
-    </div>
 
+        <button onclick="downloadAudio()">Download Audio</button><br>
+        
+    </div>
+    
     <script>
+        function convertTextToSpeech() {
+            const text = document.getElementById('text').value;
+            if (text.trim() === '') {
+                alert('Please enter some text.');
+                return;
+            }
+
+            // Check if the browser supports speech synthesis
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'hi-IN'; // Set the language to Hindi (India)
+
+                // Generate speech and save it to audioBlob
+                speechSynthesis.speak(utterance);
+                utterance.onend = function () {
+                    const blob = new Blob([new Uint8Array(utterance.audioBuffer)]);
+                    audioBlob = blob;
+                };
+            } else {
+                alert('Sorry, your browser does not support the Speech Synthesis API.');
+            }
+        }
+
+
+
+
         // Paste the clipboard text into the input box
         function pasteToInputBox() {
             navigator.clipboard.readText().then(function (clipboardText) {
@@ -148,28 +176,11 @@ text{
         let audioBlob = null;
         let audio = null;
 
-        function convertTextToSpeech() {
-            const text = document.getElementById('text').value;
-            if (text.trim() === '') {
-                alert('Please enter some text.');
-                return;
-            }
-
+        
             // Check if the browser supports speech synthesis
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'hi-IN'; // Set the language to Hindi (India)
-
-                // Generate speech and save it to audioBlob
-                speechSynthesis.speak(utterance);
-                utterance.onend = function () {
-                    const audioData = new Blob([new Uint8Array(utterance.audioBuffer)], { type: 'audio/mpeg' });
-                    audioBlob = audioData;
-                };
-            } else {
-                alert('Sorry, your browser does not support the Speech Synthesis API.');
-            }
-        } function convertTextToSpeechAndPlay() {
+        
+           
+         function convertTextToSpeechAndPlay() {
             convertTextToSpeech();
             stopAudio(); // Stop the previous audio, if any
             playAudio();
